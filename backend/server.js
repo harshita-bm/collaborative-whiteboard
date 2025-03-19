@@ -7,7 +7,12 @@ const app = express();
 const server = http.createServer(app);
 
 // ✅ Allow Multiple Frontend Origins
-const allowedOrigins = ["http://localhost:3009", "http://localhost:3006", "http://localhost:3008"];
+const allowedOrigins = [
+  "http://localhost:3009",
+  "http://localhost:3006",
+  "http://localhost:3008",
+  "https://your-netlify-app.netlify.app"  // Add your Netlify URL here
+];
 
 app.use(
   cors({
@@ -64,7 +69,15 @@ io.on("connection", (socket) => {
     console.log("User disconnected:", socket.id);
   });
 });
-
+// ✅ API Route to Check if Room Exists
+app.get("/check-room/:roomId", (req, res) => {
+  const { roomId } = req.params;
+  
+  // Check if the room exists in the Socket.io rooms
+  const roomExists = io.sockets.adapter.rooms.has(roomId);
+  
+  res.json({ exists: roomExists });
+});
 // ✅ Test Route
 app.get("/", (req, res) => {
   res.send("Server is running...");

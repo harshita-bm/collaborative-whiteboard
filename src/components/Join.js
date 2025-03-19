@@ -5,14 +5,28 @@ const Join = () => {
   const [username, setUsername] = useState("");
   const [roomId, setRoomId] = useState("");
   const navigate = useNavigate();
-
+   
+  const API_URL = process.env.REACT_APP_API_URL;
+  const response = await axios.get(`${API_URL}/check-room/${roomId}`);
   const joinRoom = () => {
     if (!username.trim() || !roomId.trim()) {
       alert("Please enter your name and a valid Room ID.");
       return;
     }
-    navigate(`/whiteboard/${roomId}`); // Navigate to the same whiteboard session
-  };
+     try {
+      // Call backend to verify the room exists
+      const response = await axios.get(`${API_URL}/check-room/${roomId}`);
+
+      if (response.data.exists) {
+        navigate(`/whiteboard/${roomId}`); // Navigate if room exists
+      } else {
+        alert("Room not found. Please enter a valid Room ID.");
+      }
+    } catch (error) {
+      console.error("Error joining room:", error);
+      alert("Server error! Please try again.");
+    }
+   };
 
   return (
     <div style={styles.container}>
